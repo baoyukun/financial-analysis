@@ -16,8 +16,10 @@ def analyse(buyer, dateList):
             with open(unicode('out/'+i+'-券商.txt', 'utf-8'), 'r') as inFile:
                 for j in inFile:
                     if buyer in j:
-                        print >>outFile, j[:-1]
-                        a.append(numFormat(j))
+                        numRecord = numFormat(j)
+                        if numRecord not in a:
+                            print >>outFile, j[:-1]
+                            a.append(numRecord)
 
 
     with open(unicode('analyse/'+buyer+'-三日.txt', 'utf-8'), 'w') as outFile:
@@ -25,8 +27,10 @@ def analyse(buyer, dateList):
             with open(unicode('out/'+i+'-券商三日.txt', 'utf-8'), 'r') as inFile:
                 for j in inFile:
                     if buyer in j:
-                        print >>outFile, j[:-1]
-                        b.append(numFormat(j))
+                        numRecord = numFormat(j)
+                        if numRecord not in b:
+                            print >>outFile, j[:-1]
+                            b.append(numRecord)
 
     permuBack1 = [3,0,1,2]
     permuBack3 = [1,2,3,0]
@@ -47,7 +51,7 @@ def analyse(buyer, dateList):
             record = b[bi]
             if record[1] in todayName:
                 oldRecord = today[todayName.index(record[1])]
-                [oldRecord[0], oldRecord[3], oldRecord[4], oldRecord[5]] = [record[0], oldRecord[3]+record[3], oldRecord[4]+record[4], oldRecord[5]+record[5]]
+                [oldRecord[3], oldRecord[4], oldRecord[5]] = [oldRecord[3]+record[3], oldRecord[4]+record[4], oldRecord[5]+record[5]]
             else:
                 if record[1] in avantHierName:
                     oldRecord = avantHier[avantHierName.index(record[1])]
@@ -63,7 +67,7 @@ def analyse(buyer, dateList):
                 record = a[ai]
                 if record[1] in todayName:
                     oldRecord = today[todayName.index(record[1])]
-                    [oldRecord[0], oldRecord[3], oldRecord[4], oldRecord[5]] = [record[0], oldRecord[3]+record[3], oldRecord[4]+record[4], oldRecord[5]+record[5]]
+                    [oldRecord[3], oldRecord[4], oldRecord[5]] = [oldRecord[3]+record[3], oldRecord[4]+record[4], oldRecord[5]+record[5]]
                 else:
                     if record[1] in yierName:
                         oldRecord = yier[yierName.index(record[1])]
