@@ -1,26 +1,16 @@
 #coding=utf-8
 import string
-        
+
 def numFormat(s):
     result = s.split()
     for i in range(3,6):
         result[i] = string.atof(result[i])
     return result
 
-def add(x,x0):
-    for i in x:
-        if i[1]==x0[1]:
-            i[0] = x0[0]
-            i[3] += x0[3]
-            i[4] += x0[4]
-            i[5] += x0[5]
-            break
-    return x
-            
 def analyse(buyer, dateList):
     a = []
     b = []
-    
+
     with open(unicode('analyse/'+buyer+'.txt', 'utf-8'), 'w') as outFile:
         for i in dateList:
             with open(unicode('out/'+i+'-券商.txt', 'utf-8'), 'r') as inFile:
@@ -28,8 +18,8 @@ def analyse(buyer, dateList):
                     if buyer in j:
                         print >>outFile, j[:-1]
                         a.append(numFormat(j))
-                        
-    
+
+
     with open(unicode('analyse/'+buyer+'-三日.txt', 'utf-8'), 'w') as outFile:
         for i in dateList:
             with open(unicode('out/'+i+'-券商三日.txt', 'utf-8'), 'r') as inFile:
@@ -37,63 +27,59 @@ def analyse(buyer, dateList):
                     if buyer in j:
                         print >>outFile, j[:-1]
                         b.append(numFormat(j))
-    
-    permu = [0,2,3,4,1]
-    permuBack = [0,4,1,2,3]
-    pointer = 4
-    c = [[],[],[],[],[]]
-    cName = [[],[],[],[],[]]
+
+    permuBack1 = [3,0,1,2]
+    permuBack3 = [1,2,3,0]
+    permuForward = [1,2,3,0]
+    pointer = 3
+    c = [[],[],[],[]]
+    cName = [[],[],[],[]]
     ai = 0
+    alen = len(a)
     bi = 0
-    
-    for i in range(len(dateList)):
-        pointer = permu[pointer]
-        c[pointer] = []
-        cName[pointer] = []
-        
-        # Add on the result of three days before
-        j = permu[pointer]
-        while (bi<len(b) and b[bi][0]==dateList[i]):
-            if b[bi][1] in cName[pointer]:
-                c[pointer] = add(c[pointer], b[bi])
+    blen = len(b)
+
+    for date in dateList:
+        pointer = permuForward[pointer]
+        [today, todayName, yier, yierName, avantHier, avantHierName] = [[], [], c[permuBack1[pointer]], cName[permuBack1[pointer]], c[permuBack3[pointer]], cName[permuBack3[pointer]]]
+
+        while (bi<blen and b[bi][0]==date):
+            record = b[bi]
+            if record[1] in todayName:
+                oldRecord = today[todayName.index(record[1])]
+                [oldRecord[0], oldRecord[3], oldRecord[4], oldRecord[5]] = [record[0], oldRecord[3]+record[3], oldRecord[4]+record[4], oldRecord[5]+record[5]]
             else:
-                cName[pointer].append(b[bi][1])
-                if b[bi][1] not in cName[j]:
-                    c[pointer].append(b[bi])
-                else:
-                    for k in c[j]:
-                        if k[1]==b[bi][1]:
-                            c[pointer].append(k)
-                            break
-                    c[pointer] = add(c[pointer], b[bi])
+                if record[1] in avantHierName:
+                    oldRecord = avantHier[avantHierName.index(record[1])]
+                    [record[3], record[4], record[5]] = [record[3]+oldRecord[3], record[4]+oldRecord[4], record[5]+oldRecord[5]]
+                todayName.append(record[1])
+                today.append(record)
             bi += 1
-        
-        record = cName[pointer]
-        
-        # Add on the result of today
-        j = permuBack[pointer]
-        while (ai<len(a) and a[ai][0]==dateList[i]):
-            if a[ai][1] not in record:
-                if a[ai][1] in cName[pointer]:
-                    c[pointer] = add(c[pointer], a[ai])
+
+        tdRecord = [i for i in todayName]
+
+        while (ai<alen and a[ai][0]==date):
+            if (a[ai][1] not in tdRecord):
+                record = a[ai]
+                if record[1] in todayName:
+                    oldRecord = today[todayName.index(record[1])]
+                    [oldRecord[0], oldRecord[3], oldRecord[4], oldRecord[5]] = [record[0], oldRecord[3]+record[3], oldRecord[4]+record[4], oldRecord[5]+record[5]]
                 else:
-                    cName[pointer].append(a[ai][1])
-                    if a[ai][1] not in cName[j]:
-                        c[pointer].append(a[ai])
-                    else:
-                        for k in c[j]:
-                            if k[1]==a[ai][1]:
-                                c[pointer].append(k)
-                                break
-                        c[pointer] = add(c[pointer], a[ai])
+                    if record[1] in yierName:
+                        oldRecord = yier[yierName.index(record[1])]
+                        [record[3], record[4], record[5]] = [record[3]+oldRecord[3], record[4]+oldRecord[4], record[5]+oldRecord[5]]
+                    todayName.append(record[1])
+                    today.append(record)
             ai += 1
-               
-        # Copy the result of yesterday
-        for k in c[j]:
-            if k[1] not in cName[pointer]:
-                cName[pointer].append(k[1])
-                c[pointer].append(k)
-                
-    with open(unicode('analyse/'+'总持仓-'+buyer+'.txt', 'utf-8'), 'w') as outFile:
+
+        for i in yierName:
+            if i not in todayName:
+                today.append(yier[yierName.index(i)])
+                todayName.append(i)
+
+        c[pointer] = today
+        cName[pointer] = todayName
+
+    with open(unicode('analyse/总持仓-'+buyer+'.txt', 'utf-8'), 'w') as outFile:
         for i in c[pointer]:
             print >>outFile, '%-20s%-30s%-110s%-70f%-70f%-30f'%(i[0],i[1],i[2],i[3],i[4],i[5])
