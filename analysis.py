@@ -7,6 +7,20 @@ def numFormat(s):
         result[i] = string.atof(result[i])
     return result
 
+def updateVar(x, xName, newRecord, oldRecord):
+    if oldRecord==[]:
+        i = ['+' if newRecord[5]>0 else '-', newRecord[3], newRecord[4], newRecord[5]]
+    else:
+        i = ['+' if newRecord[5]-oldRecord[5]>0 else '-', newRecord[3]-oldRecord[3], newRecord[4]-oldRecord[4], newRecord[5]-oldRecord[5]]
+
+    if newRecord[1] in xName:
+        x[xName.index(newRecord[1])] = i
+    else:
+        xName.append(newRecord[1])
+        x.append(i)
+
+    return [x, xName]
+
 def analyse(buyer, dateList):
     a = []
     b = []
@@ -38,6 +52,8 @@ def analyse(buyer, dateList):
     pointer = 3
     c = [[],[],[],[]]
     cName = [[],[],[],[]]
+    cVar = []
+    cVarName = []
     ai = 0
     alen = len(a)
     bi = 0
@@ -47,6 +63,7 @@ def analyse(buyer, dateList):
         pointer = permuForward[pointer]
         [today, todayName, yier, yierName, avantHier, avantHierName] = [[], [], c[permuBack1[pointer]], cName[permuBack1[pointer]], c[permuBack3[pointer]], cName[permuBack3[pointer]]]
 
+        # Update the result of three days before
         while (bi<blen and b[bi][0]==date):
             record = b[bi]
             if record[1] in todayName:
@@ -62,6 +79,14 @@ def analyse(buyer, dateList):
 
         tdRecord = [i for i in todayName]
 
+        # Update the variance
+        for i in tdRecord:
+            if i not in avantHierName:
+                [cVar, cVarName] = updateVar(cVar, cVarName, today[todayName.index(i)], [])
+            else:
+                [cVar, cVarName] = updateVar(cVar, cVarName, today[todayName.index(i)], avantHier[avantHierName.index(i)])
+
+        # Update the result of yesterday
         while (ai<alen and a[ai][0]==date):
             if (a[ai][1] not in tdRecord):
                 record = a[ai]
@@ -76,6 +101,15 @@ def analyse(buyer, dateList):
                     today.append(record)
             ai += 1
 
+        # Update the variance
+        for i in todayName:
+            if i not in tdRecord:
+                if i not in yierName:
+                    [cVar, cVarName] = updateVar(cVar, cVarName, today[todayName.index(i)], [])
+                else:
+                    [cVar, cVarName] = updateVar(cVar, cVarName, today[todayName.index(i)], yier[yierName.index(i)])
+
+        # Copy(inherit) the result of days before
         for i in yierName:
             if i not in todayName:
                 today.append(yier[yierName.index(i)])
@@ -86,4 +120,5 @@ def analyse(buyer, dateList):
 
     with open(unicode('analyse/总持仓-'+buyer+'.txt', 'utf-8'), 'w') as outFile:
         for i in c[pointer]:
-            print >>outFile, '%-20s%-30s%-110s%-70f%-70f%-30f'%(i[0],i[1],i[2],i[3],i[4],i[5])
+            varRecord = cVar[cVarName.index(i[1])]
+            print >>outFile, '%-20s%-30s%-110s%-70f%-70f%-70f%-30s%-70f%-70f%-30f'%(i[0],i[1],i[2],i[3],i[4],i[5],varRecord[0],varRecord[3],varRecord[1],varRecord[2])
