@@ -14,8 +14,10 @@ date = ['2017-4-7','2017-4-10','2017-4-11','2017-4-12','2017-4-13',
         '2017-5-8','2017-5-9','2017-5-10','2017-5-11','2017-5-12',
         '2017-5-15','2017-5-16','2017-5-17','2017-5-18','2017-5-19']
 
-# Add new members here
 who = []
+with open(unicode('in/证券营业部.txt', 'utf-8'), 'r') as inFile:
+    for i in inFile:
+        who.append(i[:-1])
 
 for i in date:
     cleanData(i)
@@ -25,7 +27,7 @@ sortedDate = sort(date)
 for i in who:
     analyse(i, sortedDate)
 
-conclusion(who)
+conclusion(who, sortedDate[-1])
 
 end = time.clock()
 print '......analysis took %fs, successfully done :)' % (end-start)

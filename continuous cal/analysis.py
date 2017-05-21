@@ -25,26 +25,21 @@ def analyse(buyer, dateList):
     a = []
     b = []
 
-    with open(unicode('analyse/'+buyer+'.txt', 'utf-8'), 'w') as outFile:
-        for i in dateList:
-            with open(unicode('out/'+i+'-券商.txt', 'utf-8'), 'r') as inFile:
-                for j in inFile:
-                    if buyer in j:
-                        numRecord = numFormat(j)
-                        if numRecord not in a:
-                            print >>outFile, j[:-1]
-                            a.append(numRecord)
+    for i in dateList:
+        with open(unicode('out/'+i+'-券商.txt', 'utf-8'), 'r') as inFile:
+            for j in inFile:
+                if buyer in j:
+                    numRecord = numFormat(j)
+                    if numRecord not in a:
+                        a.append(numRecord)
 
-
-    with open(unicode('analyse/'+buyer+'-三日.txt', 'utf-8'), 'w') as outFile:
-        for i in dateList:
-            with open(unicode('out/'+i+'-券商三日.txt', 'utf-8'), 'r') as inFile:
-                for j in inFile:
-                    if buyer in j:
-                        numRecord = numFormat(j)
-                        if numRecord not in b:
-                            print >>outFile, j[:-1]
-                            b.append(numRecord)
+    for i in dateList:
+        with open(unicode('out/'+i+'-券商三日.txt', 'utf-8'), 'r') as inFile:
+            for j in inFile:
+                if buyer in j:
+                    numRecord = numFormat(j)
+                    if numRecord not in b:
+                        b.append(numRecord)
 
     permuBack1 = [3,0,1,2]
     permuBack3 = [1,2,3,0]
