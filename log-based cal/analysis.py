@@ -29,7 +29,7 @@ def analyse(buyer, dateList):
         with open(unicode('out/'+i+'-券商.csv', 'utf-8'), 'rb') as inFiler:
             inFile = csv.reader(inFiler, dialect='excel')
             for j in inFile:
-                if buyer == j[1]:
+                if buyer in j:
                     numRecord = numFormat(j)
                     if numRecord not in a:
                         a.append(numRecord)
@@ -38,7 +38,7 @@ def analyse(buyer, dateList):
         with open(unicode('out/'+i+'-券商三日.csv', 'utf-8'), 'rb') as inFiler:
             inFile = csv.reader(inFiler, dialect='excel')
             for j in inFile:
-                if buyer == j[1]:
+                if buyer in j:
                     numRecord = numFormat(j)
                     if numRecord not in b:
                         b.append(numRecord)

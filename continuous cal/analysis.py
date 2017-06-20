@@ -15,7 +15,7 @@ def findTodayRecord(name, dateName, fileSuffix):
     with open(unicode('out/'+ dateName + fileSuffix, 'utf-8'), 'rb') as inReader:
         inFile = csv.reader(inReader, dialect='excel')
         for i in inFile:
-            if name == i[1]:
+            if name in i:
                 numRecord = numFormat(i)
                 if numRecord not in x:
                     x.append(numRecord)
@@ -29,7 +29,7 @@ def importLog(name, dateName):
     with open(unicode('analyse/汇总表-'+ dateName + '.csv', 'utf-8'), 'rb') as inReader:
         inFile = csv.reader(inReader, dialect='excel')
         for i in inFile:
-            if name == i[1]:
+            if name in i:
                 numRecord = numFormat(i)
                 xName.append(numRecord[1])
                 yName.append(numRecord[1])
